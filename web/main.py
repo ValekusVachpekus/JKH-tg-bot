@@ -1,10 +1,11 @@
 import os
 import sqlite3
 from datetime import datetime
+from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -13,6 +14,7 @@ load_dotenv()
 DB_PATH = os.getenv("DB_PATH", "data/complaints.db")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
 SECRET_KEY = os.getenv("SECRET_KEY", "change-me-in-production")
+MEDIA_DIR = Path("data/media")
 
 app = FastAPI(title="ЖКХ Админ-панель")
 
@@ -274,6 +276,26 @@ async def delete_employee(request: Request, username: str):
     db.commit()
     db.close()
     return RedirectResponse(url="/employees", status_code=302)
+
+
+# ---------------------------------------------------------------------------
+# Media serving
+# ---------------------------------------------------------------------------
+
+@app.get("/media/{filename}")
+async def serve_media(request: Request, filename: str):
+    if not check_auth(request):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    file_path = MEDIA_DIR / filename
+    if not file_path.exists() or not file_path.is_file():
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    # Security: prevent directory traversal
+    if not str(file_path.resolve()).startswith(str(MEDIA_DIR.resolve())):
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    return FileResponse(file_path)
 
 
 # ---------------------------------------------------------------------------
