@@ -1,42 +1,18 @@
-import os
-import sqlite3
 from datetime import datetime
-from pathlib import Path
 
-from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-load_dotenv()
-
-DB_PATH = os.getenv("DB_PATH", "data/complaints.db")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
-SECRET_KEY = os.getenv("SECRET_KEY", "change-me-in-production")
-MEDIA_DIR = Path("data/media")
+from web.auth import check_auth
+from web.config import ADMIN_PASSWORD, MEDIA_DIR, SECRET_KEY
+from web.database import get_db
 
 app = FastAPI(title="ЖКХ Админ-панель")
 
 templates = Jinja2Templates(directory="web/templates")
 app.mount("/static", StaticFiles(directory="web/static"), name="static")
-
-
-def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
-def check_auth(request: Request) -> bool:
-    token = request.cookies.get("auth_token")
-    return token == SECRET_KEY
-
-
-def require_auth(request: Request):
-    if not check_auth(request):
-        raise HTTPException(status_code=302, headers={"Location": "/login"})
-    return True
 
 
 # ---------------------------------------------------------------------------
