@@ -7,10 +7,12 @@ from aiogram.types import Message
 from bot.config import ADMIN_ID, DB_PATH
 from bot.database import get_all_recipient_ids, is_blocked
 from bot.keyboards import build_complaint_text
+from bot.logging_config import get_logger
 from bot.media_utils import download_media
 from bot.states import ComplaintForm
 
 router = Router()
+logger = get_logger(__name__)
 
 
 @router.message(CommandStart())
@@ -184,6 +186,11 @@ async def _submit_complaint(
         complaint_id = cur.lastrowid
         await db.commit()
         recipients = await get_all_recipient_ids(db)
+
+    logger.info(
+        "📨 Новая жалоба #%d от пользователя %d (@%s): %s | %s",
+        complaint_id, uid, username or "без username", fio, address[:50]
+    )
 
     await message.answer(f"✅ Ваша жалоба №{complaint_id} успешно отправлена на рассмотрение. Работник будет направлен для устранения проблемы.")
 

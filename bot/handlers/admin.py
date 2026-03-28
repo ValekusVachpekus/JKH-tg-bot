@@ -5,9 +5,11 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from bot.config import ADMIN_ID, DB_PATH
+from bot.logging_config import get_logger
 from bot.states import AddEmployeeForm
 
 router = Router()
+logger = get_logger(__name__)
 
 
 @router.message(Command("add_employee"))
@@ -35,6 +37,8 @@ async def process_add_employee(message: Message, state: FSMContext) -> None:
         await db.execute("INSERT INTO employees (username) VALUES (?)", (username,))
         await db.commit()
 
+    logger.info("➕ Администратор добавил работника: @%s", username)
+    
     await message.answer(
         f"✅ Работник @{username} добавлен.\n"
         "Пусть он напишет /start боту, чтобы связать аккаунт, затем пройдёт /register."

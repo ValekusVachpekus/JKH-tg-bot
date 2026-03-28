@@ -12,6 +12,3 @@ DB_PATH: str = os.getenv("DB_PATH", "data/complaints.db")
 LOG_CHAT_ID: int = int(os.getenv("LOG_CHAT_ID", "0"))
 MEDIA_DIR: Path = Path("data/media")
 MEDIA_DIR.mkdir(parents=True, exist_ok=True)
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger(__name__)

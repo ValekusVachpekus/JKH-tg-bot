@@ -4,12 +4,14 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from bot.config import ADMIN_ID, DB_PATH, LOG_CHAT_ID, logger
+from bot.config import ADMIN_ID, DB_PATH, LOG_CHAT_ID
 from bot.database import is_staff
 from bot.keyboards import build_complaint_text, complaint_keyboard
+from bot.logging_config import get_logger
 from bot.states import EmployeeRegisterForm, RejectForm
 
 router = Router()
+logger = get_logger(__name__)
 
 
 async def send_complaint_to_all(bot: Bot, complaint_id: int, text: str,
@@ -192,6 +194,12 @@ async def accept_complaint(callback: CallbackQuery) -> None:
         )
         await db.commit()
 
+    actor_name = callback.from_user.username or str(callback.from_user.id)
+    logger.info(
+        "✅ Жалоба #%d принята работником %d (@%s)",
+        complaint_id, callback.from_user.id, actor_name
+    )
+
     try:
         await callback.bot.send_message(user_id, f"✅ Ваша жалоба №{complaint_id} принята. Работник будет направлен для устранения проблемы.")
     except Exception as e:
@@ -236,6 +244,13 @@ async def block_user_callback(callback: CallbackQuery) -> None:
         await db.commit()
 
     uname = f"@{username}" if username else f"ID: {user_id}"
+    actor_name = callback.from_user.username or str(callback.from_user.id)
+    
+    logger.warning(
+        "🚫 Пользователь %d (@%s) заблокирован работником %d (@%s) по жалобе #%d",
+        user_id, username or "нет", callback.from_user.id, actor_name, complaint_id
+    )
+    
     await invalidate_complaint_messages(callback.bot, complaint_id)
     actor = callback.from_user.username or str(callback.from_user.id)
     await callback.message.reply(f"🚫 Пользователь {uname} заблокирован (@{actor}).")
@@ -292,6 +307,12 @@ async def reject_reason(message: Message, state: FSMContext) -> None:
             (message.from_user.id, complaint_id),
         )
         await db.commit()
+
+    actor_name = message.from_user.username or str(message.from_user.id)
+    logger.info(
+        "❌ Жалоба #%d отклонена работником %d (@%s). Причина: %s",
+        complaint_id, message.from_user.id, actor_name, message.text[:100]
+    )
 
     try:
         await message.bot.send_message(
