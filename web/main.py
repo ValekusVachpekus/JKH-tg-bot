@@ -402,3 +402,60 @@ async def ratings(request: Request):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+# ---------------------------------------------------------------------------
+# Account linking
+# ---------------------------------------------------------------------------
+
+@app.get("/link_account", response_class=HTMLResponse)
+async def link_account_get(request: Request):
+    return templates.TemplateResponse("link_account.html", {"request": request})
+
+
+@app.post("/link_account")
+async def link_account_post(request: Request):
+    form = await request.form()
+    code = form.get("code", "").strip()
+    
+    if not code or len(code) != 6 or not code.isdigit():
+        return templates.TemplateResponse("link_account.html", {
+            "request": request,
+            "error": "Код должен содержать 6 цифр"
+        })
+    
+    db = get_db()
+    
+    # Проверяем код
+    from datetime import datetime
+    verification = db.execute(
+        "SELECT user_id, username FROM verification_codes WHERE code=? AND used=0 AND expires_at > datetime('now')",
+        (code,)
+    ).fetchone()
+    
+    if not verification:
+        db.close()
+        return templates.TemplateResponse("link_account.html", {
+            "request": request,
+            "error": "Неверный или истёкший код"
+        })
+    
+    user_id, username = verification
+    
+    # Помечаем код как использованный
+    db.execute("UPDATE verification_codes SET used=1 WHERE code=?", (code,))
+    
+    # Связываем аккаунт
+    db.execute(
+        "UPDATE employees SET web_linked=1 WHERE user_id=?",
+        (user_id,)
+    )
+    db.commit()
+    db.close()
+    
+    logger.info(f"🔗 Аккаунт {username} ({user_id}) связан с веб-панелью")
+    
+    # Показываем успех и редиректим
+    response = RedirectResponse(url="/", status_code=302)
+    response.set_cookie("auth_token", SECRET_KEY, httponly=True, max_age=86400 * 7)
+    return response
