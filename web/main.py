@@ -13,7 +13,7 @@ from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from web.auth import check_auth, check_admin_auth, check_employee_auth, get_user_role
+from web.auth import check_auth, check_admin_auth, check_employee_auth, check_user_auth, get_user_role
 from web.config import ADMIN_PASSWORD, MEDIA_DIR, SECRET_KEY
 from web.database import get_db
 from web.logging_config import setup_logging, get_logger
@@ -156,6 +156,8 @@ async def root(request: Request):
         role = get_user_role(request)
         if role == "employee":
             return RedirectResponse(url="/employee/complaints", status_code=302)
+        elif role == "user":
+            return RedirectResponse(url="/user/complaints", status_code=302)
         return RedirectResponse(url="/admin/dashboard", status_code=302)
     else:
         return RedirectResponse(url="/login", status_code=302)
@@ -170,8 +172,10 @@ async def login_page(request: Request, error: str = None, role: str = None):
     if check_auth(request):
         if check_admin_auth(request):
             return RedirectResponse(url="/admin/complaints", status_code=302)
-        else:
+        elif check_employee_auth(request):
             return RedirectResponse(url="/employee/complaints", status_code=302)
+        elif check_user_auth(request):
+            return RedirectResponse(url="/user/complaints", status_code=302)
     return templates.TemplateResponse("login.html", {"request": request, "error": error, "role": role or "admin"})
 
 
@@ -179,10 +183,10 @@ async def login_page(request: Request, error: str = None, role: str = None):
 async def login(request: Request):
     form = await request.form()
     role = form.get("role", "admin").lower()
-    
-    if role not in ["admin", "employee"]:
+
+    if role not in ["admin", "employee", "user"]:
         return RedirectResponse(url="/login?error=1&role=admin", status_code=302)
-    
+
     if role == "admin":
         password = form.get("password", "")
         if password == ADMIN_PASSWORD:
@@ -193,37 +197,68 @@ async def login(request: Request):
             return response
         logger.warning("❌ Неудачная попытка входа администратора (неверный пароль)")
         return RedirectResponse(url="/login?error=1&role=admin", status_code=302)
-    
-    else:  # employee
+
+    elif role == "employee":
         code = form.get("code", "").strip()
-        
+
         if not code or len(code) != 6 or not code.isdigit():
             logger.warning(f"❌ Попытка входа сотрудника с неверным кодом: {code}")
             return RedirectResponse(url="/login?error=invalid_code&role=employee", status_code=302)
-        
+
         db = get_db()
         verification = db.execute(
             "SELECT user_id, username FROM verification_codes WHERE code=? AND used=0 AND expires_at > datetime('now')",
             (code,)
         ).fetchone()
-        
+
         if not verification:
             db.close()
             logger.warning(f"❌ Неверный или истёкший код: {code}")
             return RedirectResponse(url="/login?error=invalid_code&role=employee", status_code=302)
-        
+
         user_id, username = verification
-        
+
         db.execute("UPDATE verification_codes SET used=1 WHERE code=?", (code,))
         db.execute("UPDATE employees SET web_linked=1 WHERE user_id=?", (user_id,))
         db.commit()
         db.close()
-        
+
         logger.info(f"✅ Успешный вход сотрудника: {username} ({user_id})")
         response = RedirectResponse(url="/employee/complaints", status_code=302)
         response.set_cookie("auth_token", SECRET_KEY, httponly=True, max_age=86400 * 7)
         response.set_cookie("user_role", "employee", httponly=True, max_age=86400 * 7)
         response.set_cookie("employee_user_id", str(user_id), httponly=True, max_age=86400 * 7)
+        return response
+
+    else:  # user
+        code = form.get("code", "").strip()
+
+        if not code or len(code) != 6 or not code.isdigit():
+            logger.warning(f"❌ Попытка входа пользователя с неверным кодом: {code}")
+            return RedirectResponse(url="/login?error=invalid_code&role=user", status_code=302)
+
+        db = get_db()
+        verification = db.execute(
+            "SELECT user_id, username FROM verification_codes WHERE code=? AND used=0 AND expires_at > datetime('now')",
+            (code,)
+        ).fetchone()
+
+        if not verification:
+            db.close()
+            logger.warning(f"❌ Неверный или истёкший код: {code}")
+            return RedirectResponse(url="/login?error=invalid_code&role=user", status_code=302)
+
+        user_id, username = verification
+
+        db.execute("UPDATE verification_codes SET used=1 WHERE code=?", (code,))
+        db.commit()
+        db.close()
+
+        logger.info(f"✅ Успешный вход пользователя: {username} ({user_id})")
+        response = RedirectResponse(url="/user/complaints", status_code=302)
+        response.set_cookie("auth_token", SECRET_KEY, httponly=True, max_age=86400 * 7)
+        response.set_cookie("user_role", "user", httponly=True, max_age=86400 * 7)
+        response.set_cookie("user_user_id", str(user_id), httponly=True, max_age=86400 * 7)
         return response
 
 
@@ -233,6 +268,7 @@ async def logout():
     response.delete_cookie("auth_token")
     response.delete_cookie("user_role")
     response.delete_cookie("employee_user_id")
+    response.delete_cookie("user_user_id")
     return response
 
 
@@ -766,6 +802,18 @@ async def employee_ratings(request: Request):
     })
 
 
+# ---------------------------------------------------------------------------
+# User Panel
+# ---------------------------------------------------------------------------
+
+@app.get("/user/complaints", response_class=HTMLResponse)
+async def user_complaints(request: Request):
+    if not check_user_auth(request):
+        return RedirectResponse(url="/login?role=user", status_code=302)
+
+    return templates.TemplateResponse("user/complaints.html", {
+        "request": request,
+    })
 
 
 # ---------------------------------------------------------------------------

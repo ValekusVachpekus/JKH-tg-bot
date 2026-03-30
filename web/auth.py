@@ -9,7 +9,7 @@ def check_auth(request: Request) -> bool:
 
 
 def get_user_role(request: Request) -> str:
-    """Get user role from cookie: 'admin' or 'employee'"""
+    """Get user role from cookie: 'admin', 'employee' or 'user'"""
     return request.cookies.get("user_role", "admin")
 
 
@@ -21,6 +21,11 @@ def check_admin_auth(request: Request) -> bool:
 def check_employee_auth(request: Request) -> bool:
     """Check if user is authenticated as employee"""
     return check_auth(request) and get_user_role(request) == "employee"
+
+
+def check_user_auth(request: Request) -> bool:
+    """Check if user is authenticated as user (resident)"""
+    return check_auth(request) and get_user_role(request) == "user"
 
 
 def require_auth(request: Request):
