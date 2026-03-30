@@ -27,20 +27,21 @@
                 <div class="flex items-center gap-4">
                     {% if complaint.status == 'pending' %}
                     <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded">Ожидает обработки</span>
-                    <form method="post" action="/complaints/{{ complaint.id }}/accept" class="inline">
+                    <form method="post" action="/admin/complaints/{{ complaint.id }}/accept" class="inline">
                         <button type="submit" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded">
                             ✅ Принять
                         </button>
                     </form>
-                    <form method="post" action="/complaints/{{ complaint.id }}/reject" class="inline">
-                        <button type="submit" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded">
-                            ❌ Отклонить
-                        </button>
-                    </form>
+                    <button type="button" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded" onclick="document.getElementById('rejectModal').classList.remove('hidden')">
+                        ❌ Отклонить
+                    </button>
                     {% elif complaint.status == 'accepted' %}
                     <span class="px-3 py-1 bg-green-100 text-green-800 rounded">Принята</span>
                     {% elif complaint.status == 'rejected' %}
                     <span class="px-3 py-1 bg-red-100 text-red-800 rounded">Отклонена</span>
+                    {% if complaint.rejection_reason %}
+                    <p class="text-sm text-gray-600 mt-2">Причина: {{ complaint.rejection_reason }}</p>
+                    {% endif %}
                     {% elif complaint.status == 'blocked' %}
                     <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded">Пользователь заблокирован</span>
                     {% endif %}
@@ -147,4 +148,50 @@
         </div>
     </main>
 </div>
+
+<!-- Reject Modal -->
+<div id="rejectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+        <h2 class="text-xl font-bold mb-4">Причина отклонения</h2>
+        <form method="post" action="/admin/complaints/{{ complaint.id }}/reject">
+            <div class="mb-4">
+                <textarea 
+                    name="reason" 
+                    placeholder="Введите причину отклонения жалобы..." 
+                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows="4"
+                ></textarea>
+            </div>
+            <div class="flex gap-3 justify-end">
+                <button type="button" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded" onclick="document.getElementById('rejectModal').classList.add('hidden')">
+                    Отмена
+                </button>
+                <button type="submit" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded">
+                    Отклонить
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Для совместимости - функции вызывают inline код
+function showRejectModal() {
+    document.getElementById('rejectModal').classList.remove('hidden');
+}
+function hideRejectModal() {
+    document.getElementById('rejectModal').classList.add('hidden');
+}
+// Закрыть модаль при клике вне её
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('rejectModal');
+    if (modal) {
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

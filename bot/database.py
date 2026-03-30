@@ -57,6 +57,7 @@ async def init_db() -> None:
             "ALTER TABLE complaints ADD COLUMN rating INTEGER",
             "ALTER TABLE complaints ADD COLUMN review TEXT",
             "ALTER TABLE complaints ADD COLUMN rated_at TIMESTAMP",
+            "ALTER TABLE complaints ADD COLUMN rejection_reason TEXT",
         ]:
             try:
                 await db.execute(col_sql)

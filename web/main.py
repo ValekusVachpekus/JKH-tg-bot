@@ -1,4 +1,5 @@
 from datetime import datetime
+import aiohttp
 
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
@@ -9,6 +10,7 @@ from web.auth import check_auth, check_admin_auth, check_employee_auth, get_user
 from web.config import ADMIN_PASSWORD, MEDIA_DIR, SECRET_KEY
 from web.database import get_db
 from web.logging_config import setup_logging, get_logger
+import os
 
 setup_logging()
 logger = get_logger(__name__)
@@ -17,6 +19,25 @@ app = FastAPI(title="ЖКХ Панель")
 
 templates = Jinja2Templates(directory="web/templates")
 app.mount("/static", StaticFiles(directory="web/static"), name="static")
+
+BOT_TOKEN = os.getenv("BOT_TOKEN", "")
+
+async def send_notification(user_id: int, message: str):
+    """Send notification to user via Telegram bot"""
+    if not BOT_TOKEN:
+        logger.warning("⚠️ BOT_TOKEN not configured, cannot send notification")
+        return
+    
+    try:
+        url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, json={"chat_id": user_id, "text": message}) as resp:
+                if resp.status == 200:
+                    logger.info(f"✅ Notification sent to user {user_id}")
+                else:
+                    logger.warning(f"⚠️ Failed to send notification to {user_id}: {resp.status}")
+    except Exception as e:
+        logger.error(f"❌ Error sending notification: {e}")
 
 
 @app.on_event("startup")
@@ -234,12 +255,17 @@ async def admin_accept_complaint(request: Request, complaint_id: int):
         return RedirectResponse(url="/login?role=admin", status_code=302)
     
     db = get_db()
+    complaint = db.execute("SELECT user_id FROM complaints WHERE id = ?", (complaint_id,)).fetchone()
     db.execute(
         "UPDATE complaints SET status = 'accepted' WHERE id = ? AND status = 'pending'",
         (complaint_id,)
     )
     db.commit()
     db.close()
+    
+    if complaint:
+        await send_notification(complaint["user_id"], f"✅ Жалоба #{complaint_id} принята в работу")
+    
     return RedirectResponse(url=f"/admin/complaints/{complaint_id}", status_code=302)
 
 
@@ -248,13 +274,24 @@ async def admin_reject_complaint(request: Request, complaint_id: int):
     if not check_admin_auth(request):
         return RedirectResponse(url="/login?role=admin", status_code=302)
     
+    form = await request.form()
+    reason = form.get("reason", "").strip()
+    
     db = get_db()
+    complaint = db.execute("SELECT user_id FROM complaints WHERE id = ?", (complaint_id,)).fetchone()
     db.execute(
-        "UPDATE complaints SET status = 'rejected' WHERE id = ? AND status = 'pending'",
-        (complaint_id,)
+        "UPDATE complaints SET status = 'rejected', rejection_reason = ? WHERE id = ? AND status = 'pending'",
+        (reason if reason else None, complaint_id)
     )
     db.commit()
     db.close()
+    
+    if complaint:
+        msg = f"❌ Жалоба #{complaint_id} отклонена"
+        if reason:
+            msg += f"\n\nПричина: {reason}"
+        await send_notification(complaint["user_id"], msg)
+    
     return RedirectResponse(url=f"/admin/complaints/{complaint_id}", status_code=302)
 
 
@@ -465,12 +502,17 @@ async def employee_accept_complaint(request: Request, complaint_id: int):
         return RedirectResponse(url="/login?role=employee", status_code=302)
     
     db = get_db()
+    complaint = db.execute("SELECT user_id FROM complaints WHERE id = ?", (complaint_id,)).fetchone()
     db.execute(
         "UPDATE complaints SET status = 'accepted' WHERE id = ? AND status = 'pending'",
         (complaint_id,)
     )
     db.commit()
     db.close()
+    
+    if complaint:
+        await send_notification(complaint["user_id"], f"✅ Жалоба #{complaint_id} принята в работу")
+    
     return RedirectResponse(url=f"/employee/complaints/{complaint_id}", status_code=302)
 
 
@@ -479,13 +521,24 @@ async def employee_reject_complaint(request: Request, complaint_id: int):
     if not check_employee_auth(request):
         return RedirectResponse(url="/login?role=employee", status_code=302)
     
+    form = await request.form()
+    reason = form.get("reason", "").strip()
+    
     db = get_db()
+    complaint = db.execute("SELECT user_id FROM complaints WHERE id = ?", (complaint_id,)).fetchone()
     db.execute(
-        "UPDATE complaints SET status = 'rejected' WHERE id = ? AND status = 'pending'",
-        (complaint_id,)
+        "UPDATE complaints SET status = 'rejected', rejection_reason = ? WHERE id = ? AND status = 'pending'",
+        (reason if reason else None, complaint_id)
     )
     db.commit()
     db.close()
+    
+    if complaint:
+        msg = f"❌ Жалоба #{complaint_id} отклонена"
+        if reason:
+            msg += f"\n\nПричина: {reason}"
+        await send_notification(complaint["user_id"], msg)
+    
     return RedirectResponse(url=f"/employee/complaints/{complaint_id}", status_code=302)
 
 
