@@ -3,7 +3,10 @@ from pathlib import Path
 
 from aiogram import Bot
 
-from bot.config import MEDIA_DIR, logger
+from bot.config import MEDIA_DIR
+from bot.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 async def download_media(bot: Bot, media_file_id: str, media_type: str, user_id: int) -> str | None:

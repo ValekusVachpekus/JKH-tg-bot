@@ -207,3 +207,132 @@ async def _submit_complaint(
     uname = f"@{username}" if username else "без username"
     text = build_complaint_text(complaint_id, uname, uid, fio, address, description)
     await send_complaint_to_all(message.bot, complaint_id, text, media_file_id, media_type, recipients)
+
+
+# ---------------------------------------------------------------------------
+# Rating system
+# ---------------------------------------------------------------------------
+
+@router.message(Command("rate"))
+async def cmd_rate(message: Message, state: FSMContext) -> None:
+    """Start rating process for user"""
+    if await is_blocked(message.from_user.id):
+        await message.answer("❌ Вы заблокированы.")
+        return
+    
+    uid = message.from_user.id
+    
+    # Find last accepted complaint without rating
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute(
+            "SELECT id FROM complaints WHERE user_id=? AND status='accepted' AND rating IS NULL ORDER BY created_at DESC LIMIT 1",
+            (uid,)
+        )
+        complaint = await cursor.fetchone()
+    
+    if not complaint:
+        await message.answer("❌ У вас нет принятых жалоб для оценки.")
+        return
+    
+    complaint_id = complaint[0]
+    await state.set_state(RatingForm.rating)
+    await state.update_data(complaint_id=complaint_id)
+    
+    await message.answer(
+        f"⭐ <b>Оценка жалобы #{complaint_id}</b>\n\n"
+        "Оцените качество выполненной работы от 1 до 5:\n"
+        "1 - Очень плохо\n"
+        "2 - Плохо\n"
+        "3 - Удовлетворительно\n"
+        "4 - Хорошо\n"
+        "5 - Отлично\n\n"
+        "Отправьте цифру от 1 до 5:",
+        parse_mode="HTML"
+    )
+
+
+@router.message(RatingForm.rating)
+async def process_rating(message: Message, state: FSMContext) -> None:
+    """Process star rating (1-5)"""
+    if await is_blocked(message.from_user.id):
+        await state.clear()
+        await message.answer("❌ Вы заблокированы.")
+        return
+    
+    try:
+        rating = int(message.text.strip())
+        if not 1 <= rating <= 5:
+            raise ValueError()
+    except (ValueError, AttributeError):
+        await message.answer("❌ Пожалуйста, отправьте цифру от 1 до 5.")
+        return
+    
+    await state.update_data(rating=rating)
+    await state.set_state(RatingForm.review)
+    
+    stars = "⭐" * rating
+    await message.answer(
+        f"{stars}\n\n"
+        "Спасибо за оценку! Теперь напишите отзыв о выполненной работе.\n\n"
+        "Или отправьте /skip чтобы пропустить отзыв.",
+        parse_mode="HTML"
+    )
+
+
+@router.message(RatingForm.review, Command("skip"))
+async def skip_review(message: Message, state: FSMContext) -> None:
+    """Skip review and save rating"""
+    data = await state.get_data()
+    complaint_id = data.get("complaint_id")
+    rating = data.get("rating")
+    
+    await state.clear()
+    
+    uid = message.from_user.id
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "UPDATE complaints SET rating=?, rated_at=datetime('now') WHERE id=?",
+            (rating, complaint_id)
+        )
+        await db.commit()
+    
+    logger.info(f"⭐ Жалоба #{complaint_id} оценена на {rating} звезд (без отзыва) пользователем {uid}")
+    
+    await message.answer(
+        f"✅ Спасибо за оценку!\n\n"
+        f"{'⭐' * rating}\n\n"
+        "Ваше мнение поможет улучшить качество обслуживания."
+    )
+
+
+@router.message(RatingForm.review)
+async def process_review(message: Message, state: FSMContext) -> None:
+    """Save rating with review text"""
+    if await is_blocked(message.from_user.id):
+        await state.clear()
+        await message.answer("❌ Вы заблокированы.")
+        return
+    
+    data = await state.get_data()
+    complaint_id = data.get("complaint_id")
+    rating = data.get("rating")
+    review = message.text.strip()
+    
+    await state.clear()
+    
+    uid = message.from_user.id
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute(
+            "UPDATE complaints SET rating=?, review=?, rated_at=datetime('now') WHERE id=?",
+            (rating, review, complaint_id)
+        )
+        await db.commit()
+    
+    logger.info(f"⭐ Жалоба #{complaint_id} оценена на {rating} звезд пользователем {uid} с отзывом: {review[:100]}")
+    
+    await message.answer(
+        f"✅ Спасибо за оценку и отзыв!\n\n"
+        f"{'⭐' * rating}\n\n"
+        f'"{review}"\n\n'
+        "Ваше мнение поможет улучшить качество обслуживания."
+    )
