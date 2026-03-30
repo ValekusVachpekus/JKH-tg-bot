@@ -189,7 +189,7 @@ docker compose down
 
 ## 📄 Лицензия
 
-[MIT](LICENSE) 
+[Лицензия](LICENSE) 
 
 ## 👤 Автор
 
