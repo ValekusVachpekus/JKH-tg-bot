@@ -31,45 +31,43 @@
     <div class="grid gap-4">
         {% for c in complaints %}
         <a href="/user/complaints/{{ c.id }}" class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow block">
-            <div class="flex justify-between items-start">
-                <div class="flex-1">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">
-                        Жалоба №{{ c.id }}
-                    </h3>
-                    <p class="text-gray-600 mb-2">
+            <div class="flex justify-between items-start gap-4">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800 truncate">
+                            Жалоба №{{ c.id }}
+                        </h3>
+                        {% if c.status == 'pending' %}
+                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium whitespace-nowrap">Ожидает</span>
+                        {% elif c.status == 'accepted' %}
+                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium whitespace-nowrap">Принята</span>
+                        {% elif c.status == 'rejected' %}
+                        <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium whitespace-nowrap">Отклонена</span>
+                        {% elif c.status == 'blocked' %}
+                        <span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium whitespace-nowrap">Заблокировано</span>
+                        {% endif %}
+                    </div>
+                    <p class="text-gray-600 mb-2 truncate">
                         <span class="font-medium">Адрес:</span> {{ c.address }}
                     </p>
-                    <p class="text-gray-600 mb-3">
+                    <p class="text-gray-600 mb-3 line-clamp-2">
                         {{ c.description[:100] }}{% if c.description|length > 100 %}...{% endif %}
                     </p>
-                    
+
                     {% if c.employee_info %}
-                    <p class="text-sm text-gray-500">
+                    <p class="text-sm text-gray-500 truncate">
                         👷 <span class="font-medium">{{ c.employee_info.fio or 'Работник' }}</span>
-                        {% if c.employee_info.position %}({{ c.employee_info.position }}){% endif %}
+                        {% if c.employee_info.position %}— {{ c.employee_info.position }}{% endif %}
                     </p>
                     {% endif %}
                 </div>
-                
-                <div class="flex flex-col items-end gap-2">
-                    {% if c.status == 'pending' %}
-                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">Ожидает</span>
-                    {% elif c.status == 'accepted' %}
-                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Принята</span>
-                    {% elif c.status == 'rejected' %}
-                    <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">Отклонена</span>
-                    {% elif c.status == 'blocked' %}
-                    <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium">Заблокировано</span>
-                    {% endif %}
-                    
+
+                <div class="flex flex-col items-end gap-1 flex-shrink-0">
                     {% if c.rating %}
-                    <span class="text-yellow-500">{{ "⭐" * c.rating }}</span>
+                    <span class="text-yellow-500 text-lg">{{ "⭐" * c.rating }}</span>
                     {% elif c.status == 'accepted' %}
-                    <a href="/user/complaints/{{ c.id }}/rate" class="text-sm text-blue-500 hover:text-blue-700 underline">
-                        Оценить
-                    </a>
+                    <span class="text-sm text-blue-500 hover:text-blue-700 font-medium">Оценить →</span>
                     {% endif %}
-                    
                     <span class="text-xs text-gray-400">{{ c.created_at[:10] }}</span>
                 </div>
             </div>
