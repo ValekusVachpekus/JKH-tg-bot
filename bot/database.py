@@ -55,7 +55,8 @@ async def init_db() -> None:
                 user_id    INTEGER NOT NULL,
                 username   TEXT,
                 used       INTEGER DEFAULT 0,
-                expires_at TIMESTAMP NOT NULL
+                expires_at TIMESTAMP NOT NULL,
+                role       TEXT DEFAULT 'employee'
             )
         """)
         # Migrations for existing databases
@@ -68,6 +69,7 @@ async def init_db() -> None:
             "ALTER TABLE complaints ADD COLUMN rated_at TIMESTAMP",
             "ALTER TABLE complaints ADD COLUMN rejection_reason TEXT",
             "ALTER TABLE employees ADD COLUMN web_linked INTEGER DEFAULT 0",
+            "ALTER TABLE verification_codes ADD COLUMN role TEXT DEFAULT 'employee'",
         ]:
             try:
                 await db.execute(col_sql)

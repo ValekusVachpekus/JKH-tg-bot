@@ -467,16 +467,16 @@ async def cmd_link_account(message: Message) -> None:
         
         try:
             await db.execute(
-                "INSERT INTO verification_codes (code, user_id, username, expires_at) VALUES (?, ?, ?, ?)",
-                (code, uid, username, expires)
+                "INSERT INTO verification_codes (code, user_id, username, expires_at, role) VALUES (?, ?, ?, ?, ?)",
+                (code, uid, username, expires, "employee")
             )
             await db.commit()
-        except:
+        except Exception:
             # Code already exists, delete and retry
             await db.execute("DELETE FROM verification_codes WHERE code=?", (code,))
             await db.execute(
-                "INSERT INTO verification_codes (code, user_id, username, expires_at) VALUES (?, ?, ?, ?)",
-                (code, uid, username, expires)
+                "INSERT INTO verification_codes (code, user_id, username, expires_at, role) VALUES (?, ?, ?, ?, ?)",
+                (code, uid, username, expires, "employee")
             )
             await db.commit()
     

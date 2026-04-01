@@ -464,13 +464,13 @@ async def login(request: Request):
 
         db = get_db()
         verification = db.execute(
-            "SELECT user_id, username FROM verification_codes WHERE code=? AND used=0 AND expires_at > datetime('now')",
+            "SELECT user_id, username FROM verification_codes WHERE code=? AND used=0 AND expires_at > datetime('now') AND (role='employee' OR role IS NULL)",
             (code,)
         ).fetchone()
 
         if not verification:
             db.close()
-            logger.warning(f"❌ Неверный или истёкший код: {code}")
+            logger.warning(f"❌ Неверный или истёкший код для сотрудника: {code}")
             return RedirectResponse(url="/login?error=invalid_code&role=employee", status_code=302)
 
         user_id, username = verification
@@ -496,13 +496,13 @@ async def login(request: Request):
 
         db = get_db()
         verification = db.execute(
-            "SELECT user_id, username FROM verification_codes WHERE code=? AND used=0 AND expires_at > datetime('now')",
+            "SELECT user_id, username FROM verification_codes WHERE code=? AND used=0 AND expires_at > datetime('now') AND role='user'",
             (code,)
         ).fetchone()
 
         if not verification:
             db.close()
-            logger.warning(f"❌ Неверный или истёкший код: {code}")
+            logger.warning(f"❌ Неверный или истёкший код для пользователя: {code}")
             return RedirectResponse(url="/login?error=invalid_code&role=user", status_code=302)
 
         user_id, username = verification
