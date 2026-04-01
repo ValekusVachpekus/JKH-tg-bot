@@ -6,6 +6,7 @@
 
 from datetime import datetime
 import aiohttp
+import json
 import os
 
 from dotenv import load_dotenv
@@ -191,13 +192,16 @@ async def send_media_message(chat_id: int, media_type: str, media_file_id: str, 
                 "parse_mode": "HTML",
             }
             if reply_markup:
-                data["reply_markup"] = {"inline_keyboard": reply_markup}
+                data["reply_markup"] = json.dumps({"inline_keyboard": reply_markup})
 
             async with aiohttp.ClientSession() as session:
                 with open(file_path, 'rb') as f:
                     form_data = aiohttp.FormData()
                     for key, value in data.items():
-                        form_data.add_field(key, value)
+                        if isinstance(value, (dict, list)):
+                            form_data.add_field(key, json.dumps(value))
+                        else:
+                            form_data.add_field(key, str(value))
                     form_data.add_field(media_type, f, filename=media_file_id)
 
                     async with session.post(url, data=form_data) as resp:
@@ -666,8 +670,8 @@ async def admin_accept_complaint(request: Request, complaint_id: int):
     db = get_db()
     complaint = db.execute("SELECT user_id FROM complaints WHERE id = ?", (complaint_id,)).fetchone()
     db.execute(
-        "UPDATE complaints SET status = 'accepted' WHERE id = ? AND status = 'pending'",
-        (complaint_id,)
+        "UPDATE complaints SET status = 'accepted', accepted_by = ? WHERE id = ? AND status = 'pending'",
+        (ADMIN_ID, complaint_id)
     )
     db.commit()
     db.close()
@@ -681,7 +685,7 @@ async def admin_accept_complaint(request: Request, complaint_id: int):
         )
         await send_notification(complaint["user_id"], notification)
         # Log to archive group
-        await log_to_archive_group(complaint_id, "принята", None, None)
+        await log_to_archive_group(complaint_id, "принята", ADMIN_ID, None)
     
     return RedirectResponse(url=f"/admin/complaints/{complaint_id}", status_code=302)
 
@@ -709,7 +713,7 @@ async def admin_reject_complaint(request: Request, complaint_id: int):
             msg += f"\n\n📝 <b>Причина:</b> {reason}"
         await send_notification(complaint["user_id"], msg)
         # Log to archive group
-        await log_to_archive_group(complaint_id, "отклонена", None, None, reason)
+        await log_to_archive_group(complaint_id, "отклонена", ADMIN_ID, None, reason)
     
     return RedirectResponse(url=f"/admin/complaints/{complaint_id}", status_code=302)
 
