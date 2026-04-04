@@ -467,10 +467,17 @@ async def login(request: Request):
             return RedirectResponse(url="/login?error=invalid_code&role=employee", status_code=302)
 
         db = get_db()
+        
+        # Debug: check all codes
+        all_codes = db.execute("SELECT code, user_id, username, expires_at, role, used FROM verification_codes").fetchall()
+        logger.info(f"🔍 DEBUG: Все коды в БД: {all_codes}")
+        
         verification = db.execute(
             "SELECT user_id, username FROM verification_codes WHERE code=? AND used=0 AND expires_at > datetime('now') AND (role='employee' OR role IS NULL)",
             (code,)
         ).fetchone()
+        
+        logger.info(f"🔍 DEBUG: Поиск кода {code}, результат: {verification}")
 
         if not verification:
             db.close()

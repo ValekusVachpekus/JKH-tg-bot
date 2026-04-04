@@ -380,7 +380,7 @@ async def cmd_link_account_user(message: Message) -> None:
         
         # Save to DB with 10-minute expiry
         from datetime import datetime, timedelta
-        expires = datetime.now() + timedelta(minutes=10)
+        expires = (datetime.now() + timedelta(minutes=10)).strftime('%Y-%m-%d %H:%M:%S')
         
         if emp:
             # Employee - check if registered
