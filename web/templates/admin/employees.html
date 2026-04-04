@@ -7,7 +7,7 @@
         <div class="text-white text-xl font-bold mb-8">🏠 ЖКХ Панель</div>
         <nav class="space-y-2">
             <a href="/admin/dashboard" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 rounded">📊 Дашборд</a>
-            <a href="/admin/dashboard" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 rounded">📋 Жалобы</a>
+            <a href="/admin/complaints" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 rounded">📋 Жалобы</a>
             <a href="/admin/employees" class="block px-4 py-2 text-white bg-gray-700 rounded">👷 Работники</a>
             <a href="/admin/ratings" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 rounded">⭐ Рейтинги</a>
             <a href="/admin/blocked" class="block px-4 py-2 text-gray-300 hover:bg-gray-700 rounded">🚫 Заблокированные</a>
@@ -39,7 +39,7 @@
             </div>
             {% endif %}
             
-            <form method="post" action="/employees/add" class="flex gap-4">
+            <form method="post" action="/admin/employees/add" class="flex gap-4">
                 <input 
                     type="text" 
                     name="username" 
@@ -77,8 +77,8 @@
                         <span class="text-sm text-yellow-600">⏳ Ожидает регистрации</span>
                         {% endif %}
                     </div>
-                    <form method="post" action="/employees/delete/{{ emp.username }}" 
-                          onsubmit="return confirm('Удалить работника @{{ emp.username }}?')">
+                    <form method="post" action="/admin/employees/delete/{{ emp.username }}" 
+                          onsubmit="return confirm('Удалить работника @{{ emp.username }}?')">>
                         <button type="submit" class="text-red-500 hover:text-red-700">🗑</button>
                     </form>
                 </div>
