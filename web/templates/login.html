@@ -1,10 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Вход — ЖКХ Панель{% endblock %}
 {% block content %}
-<div class="min-h-screen flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">🏠 ЖКХ Панель</h1>
-        
+<div class="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+    <div class="max-w-md w-full">
         {% if error == 'invalid_code' %}
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
             Неверный или истёкший код
@@ -15,167 +13,151 @@
         </div>
         {% endif %}
         
-        <form method="post" action="/login" id="loginForm">
-            <!-- Role selection -->
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-bold mb-3">
-                    Вход как:
+        <!-- Role selection -->
+        <div class="mb-6 bg-white shadow-md rounded px-8 pt-6 pb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-3">
+                Вход как:
+            </label>
+            <div class="space-y-3">
+                <label class="flex items-center cursor-pointer">
+                    <input
+                        type="radio"
+                        name="role_selector"
+                        value="admin"
+                        {% if role == 'admin' or not role %}checked{% endif %}
+                        onchange="toggleForm()"
+                        class="mr-2"
+                    >
+                    <span class="text-gray-700">👨‍💼 Администратор</span>
                 </label>
-                <div class="space-y-3">
-                    <label class="flex items-center cursor-pointer">
-                        <input
-                            type="radio"
-                            name="role"
-                            value="admin"
-                            {% if role == 'admin' %}checked{% endif %}
-                            onchange="toggleForm()"
-                            class="mr-2"
-                        >
-                        <span class="text-gray-700">👨‍💼 Администратор</span>
-                    </label>
-                    <label class="flex items-center cursor-pointer">
-                        <input
-                            type="radio"
-                            name="role"
-                            value="employee"
-                            {% if role == 'employee' %}checked{% endif %}
-                            onchange="toggleForm()"
-                            class="mr-2"
-                        >
-                        <span class="text-gray-700">👷 Сотрудник</span>
-                    </label>
-                    <label class="flex items-center cursor-pointer">
-                        <input
-                            type="radio"
-                            name="role"
-                            value="user"
-                            {% if role == 'user' %}checked{% endif %}
-                            onchange="toggleForm()"
-                            class="mr-2"
-                        >
-                        <span class="text-gray-700">👤 Пользователь</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Admin login form -->
-            <div id="adminForm" {% if role != 'admin' %}style="display: none;"{% endif %}>
-                <div class="mb-6">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
-                        Пароль
-                    </label>
+                <label class="flex items-center cursor-pointer">
                     <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        placeholder="Введите пароль"
-                        {% if role == 'admin' %}autofocus{% endif %}
+                        type="radio"
+                        name="role_selector"
+                        value="employee"
+                        {% if role == 'employee' %}checked{% endif %}
+                        onchange="toggleForm()"
+                        class="mr-2"
                     >
-                </div>
-                <button
-                    type="submit"
-                    class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                >
-                    Войти
-                </button>
-            </div>
-
-            <!-- Employee login form -->
-            <div id="employeeForm" {% if role != 'employee' %}style="display: none;"{% endif %}>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="code">
-                        Код из Telegram бота
-                    </label>
-                    <p class="text-gray-600 text-sm mb-3">
-                        Отправьте команду <code class="bg-gray-100 px-2 py-1">/link_account</code> боту, чтобы получить код
-                    </p>
+                    <span class="text-gray-700">👷 Сотрудник</span>
+                </label>
+                <label class="flex items-center cursor-pointer">
                     <input
-                        type="text"
-                        id="code"
-                        name="code"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-center text-2xl tracking-widest"
-                        placeholder="000000"
-                        maxlength="6"
-                        pattern="[0-9]{6}"
-                        {% if role == 'employee' %}autofocus{% endif %}
+                        type="radio"
+                        name="role_selector"
+                        value="user"
+                        {% if role == 'user' %}checked{% endif %}
+                        onchange="toggleForm()"
+                        class="mr-2"
                     >
-                </div>
-                <button
-                    type="submit"
-                    class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                >
-                    Войти по коду
-                </button>
+                    <span class="text-gray-700">👤 Пользователь</span>
+                </label>
             </div>
+        </div>
 
-            <!-- User login form -->
-            <div id="userForm" {% if role != 'user' %}style="display: none;"{% endif %}>
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="user_code">
-                        Код из Telegram бота
-                    </label>
-                    <p class="text-gray-600 text-sm mb-3">
-                        Отправьте команду <code class="bg-gray-100 px-2 py-1">/link_account</code> боту, чтобы получить код
-                    </p>
-                    <input
-                        type="text"
-                        id="user_code"
-                        name="code"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-center text-2xl tracking-widest"
-                        placeholder="000000"
-                        maxlength="6"
-                        pattern="[0-9]{6}"
-                        {% if role == 'user' %}autofocus{% endif %}
-                    >
-                </div>
-                <button
-                    type="submit"
-                    class="w-full bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        <!-- Admin login form -->
+        <form method="post" action="/login" id="adminForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" {% if role != 'admin' and role %}style="display: none;"{% endif %}>
+            <input type="hidden" name="role" value="admin">
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="admin_password">
+                    Пароль
+                </label>
+                <input
+                    type="password"
+                    id="admin_password"
+                    name="password"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    placeholder="Введите пароль"
                 >
-                    Войти по коду
-                </button>
             </div>
+            <button
+                type="submit"
+                class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+                Войти
+            </button>
+        </form>
+
+        <!-- Employee login form -->
+        <form method="post" action="/login" id="employeeForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" {% if role != 'employee' %}style="display: none;"{% endif %}>
+            <input type="hidden" name="role" value="employee">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="employee_code">
+                    Код из Telegram бота
+                </label>
+                <p class="text-gray-600 text-sm mb-3">
+                    Отправьте команду <code class="bg-gray-100 px-2 py-1">/link_account</code> боту, чтобы получить код
+                </p>
+                <input
+                    type="text"
+                    id="employee_code"
+                    name="code"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-center text-2xl tracking-widest"
+                    placeholder="000000"
+                    maxlength="6"
+                    pattern="[0-9]{6}"
+                >
+            </div>
+            <button
+                type="submit"
+                class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+                Войти по коду
+            </button>
+        </form>
+
+        <!-- User login form -->
+        <form method="post" action="/login" id="userForm" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" {% if role != 'user' %}style="display: none;"{% endif %}>
+            <input type="hidden" name="role" value="user">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="user_code">
+                    Код из Telegram бота
+                </label>
+                <p class="text-gray-600 text-sm mb-3">
+                    Отправьте команду <code class="bg-gray-100 px-2 py-1">/link_account</code> боту, чтобы получить код
+                </p>
+                <input
+                    type="text"
+                    id="user_code"
+                    name="code"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-center text-2xl tracking-widest"
+                    placeholder="000000"
+                    maxlength="6"
+                    pattern="[0-9]{6}"
+                >
+            </div>
+            <button
+                type="submit"
+                class="w-full bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+                Войти по коду
+            </button>
         </form>
     </div>
 </div>
 
 <script>
 function toggleForm() {
-    const role = document.querySelector('input[name="role"]:checked').value;
+    const role = document.querySelector('input[name="role_selector"]:checked').value;
     const adminForm = document.getElementById('adminForm');
     const employeeForm = document.getElementById('employeeForm');
     const userForm = document.getElementById('userForm');
-    
-    // Clear all inputs when switching
-    document.getElementById('password').value = '';
-    document.getElementById('code').value = '';
-    document.getElementById('user_code').value = '';
 
     if (role === 'admin') {
         adminForm.style.display = 'block';
         employeeForm.style.display = 'none';
         userForm.style.display = 'none';
-        document.getElementById('password').disabled = false;
-        document.getElementById('code').disabled = true;
-        document.getElementById('user_code').disabled = true;
-        document.getElementById('password').focus();
+        setTimeout(() => document.getElementById('admin_password').focus(), 100);
     } else if (role === 'employee') {
         adminForm.style.display = 'none';
         employeeForm.style.display = 'block';
         userForm.style.display = 'none';
-        document.getElementById('password').disabled = true;
-        document.getElementById('code').disabled = false;
-        document.getElementById('user_code').disabled = true;
-        document.getElementById('code').focus();
+        setTimeout(() => document.getElementById('employee_code').focus(), 100);
     } else {
         adminForm.style.display = 'none';
         employeeForm.style.display = 'none';
         userForm.style.display = 'block';
-        document.getElementById('password').disabled = true;
-        document.getElementById('code').disabled = true;
-        document.getElementById('user_code').disabled = false;
-        document.getElementById('user_code').focus();
+        setTimeout(() => document.getElementById('user_code').focus(), 100);
     }
 }
 </script>
