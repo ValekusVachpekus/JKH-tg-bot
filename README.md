@@ -1,113 +1,126 @@
-# 🏠 ЖКХ Bot - Telegram Bot + Web Panel
+# 🏠 Housing Utilities Assistant - Telegram Bot + Web Panel
 
-Система приёма жалоб от жителей на проблемы в ЖКХ.
+A complaint management system for housing maintenance requests.
 
 ## Demo
 
 ### Screenshots
 
-**Веб-панель администратора:**
-<img width="3070" height="1516" alt="изображение" src="https://github.com/user-attachments/assets/89dc83b0-a245-4dc4-ae1c-75a307db782c" />
-<img width="3070" height="1508" alt="изображение" src="https://github.com/user-attachments/assets/f37d3514-9aa9-4cf8-964c-6c0cb81799e4" />
-<img width="3070" height="1514" alt="изображение" src="https://github.com/user-attachments/assets/d10b1942-05de-4a7e-ba05-eb591401b452" />
-<img width="3070" height="1514" alt="изображение" src="https://github.com/user-attachments/assets/b8629919-9604-4cbf-a430-851af02d1dbb" />
-<img width="3070" height="1514" alt="изображение" src="https://github.com/user-attachments/assets/c8ff9244-0523-4686-a008-03e9c4fd9baf" />
+**Admin Web Panel:**
+<img width="3070" height="1516" alt="image" src="https://github.com/user-attachments/assets/89dc83b0-a245-4dc4-ae1c-75a307db782c" />
+<img width="3070" height="1508" alt="image" src="https://github.com/user-attachments/assets/f37d3514-9aa9-4cf8-964c-6c0cb81799e4" />
+<img width="3070" height="1514" alt="image" src="https://github.com/user-attachments/assets/d10b1942-05de-4a7e-ba05-eb591401b452" />
+<img width="3070" height="1514" alt="image" src="https://github.com/user-attachments/assets/b8629919-9604-4cbf-a430-851af02d1dbb" />
+<img width="3070" height="1514" alt="image" src="https://github.com/user-attachments/assets/c8ff9244-0523-4686-a008-03e9c4fd9baf" />
 
-**Веб-панель работника:**
-<img width="3070" height="1510" alt="изображение" src="https://github.com/user-attachments/assets/d392ccb1-78c9-455d-a89f-0be2e716c1c9" />
-
-
-**Telegram бот - подача жалобы:**
-<img width="1258" height="1496" alt="изображение" src="https://github.com/user-attachments/assets/d7cd1358-f7be-4d32-85d9-afcbf3b27ebf" />
-<img width="762" height="342" alt="изображение" src="https://github.com/user-attachments/assets/7ca50cf1-21d8-4369-b213-494ba3355e40" />
-<img width="822" height="560" alt="изображение" src="https://github.com/user-attachments/assets/689190d4-4cca-4592-a173-75d7029569e7" />
+**Employee Web Panel:**
+<img width="3070" height="1510" alt="image" src="https://github.com/user-attachments/assets/d392ccb1-78c9-455d-a89f-0be2e716c1c9" />
 
 
-**Веб-панель пользователя:**
-<img width="2116" height="1512" alt="изображение" src="https://github.com/user-attachments/assets/692828b4-a212-4499-b3bd-073babc85ea0" />
+**Telegram Bot - Complaint Submission:**
+<img width="1258" height="1496" alt="image" src="https://github.com/user-attachments/assets/d7cd1358-f7be-4d32-85d9-afcbf3b27ebf" />
+<img width="762" height="342" alt="image" src="https://github.com/user-attachments/assets/7ca50cf1-21d8-4369-b213-494ba3355e40" />
+<img width="822" height="560" alt="image" src="https://github.com/user-attachments/assets/689190d4-4cca-4592-a173-75d7029569e7" />
 
-## Функциолнал
+
+**User Web Panel:**
+<img width="2116" height="1512" alt="image" src="https://github.com/user-attachments/assets/692828b4-a212-4499-b3bd-073babc85ea0" />
+
+## Product Context
+
+### End Users
+- **Residents** - submit complaints about housing issues
+- **Employees** - maintenance workers who handle complaints
+- **Admin** - manages employees and oversees the system
+
+### Problem
+Residents struggle with slow feedback and lost requests in messenger groups. Staff lack a centralized tool to track ticket history and manage maintenance tasks.
+
+### Solution
+A unified ecosystem for seamless submission, tracking, and management of housing maintenance requests through Telegram bot and web interface.
+
+## Features
 
 ### Telegram Bot
-- **Пользователи** - подают жалобы (ФИО, адрес, суть проблемы, фото/видео)
-- **Работники** - принимают/отклоняют жалобы
-- **Администратор** - управляет работниками, обрабатывает жалобы
-- **Система рейтинга** - жители оценивают качество работы (1-5 ⭐)
-- Блокировка пользователей
-- Уведомления о статусе жалобы с информацией о работнике
-- Архивирование обработанных жалоб в архив-группу
+- **Residents** - submit complaints (full name, address, issue description, photo/video)
+- **Employees** - accept/reject complaints
+- **Administrator** - manage employees, handle complaints
+- **Rating System** - residents rate work quality (1-5 ⭐)
+- User blocking
+- Status notifications with employee information
+- Archiving processed complaints to archive group
 
-### Веб-панель администратора
-- 📊 **Дашборд** - статистика, графики (Chart.js)
-- 📋 **Жалобы** - список жалоб с фильтрами, поиском, пагинацией, принятие/отклонение жалоб с уведомлениями
-- 👷 **Работники** - добавление/удаление сотрудников
-- ⭐ **Рейтинги** - статистика работников, отзывы
-- 🚫 **Заблокированные** - управление заблокированными пользователями
+### Admin Web Panel
+- 📊 **Dashboard** - statistics, charts (Chart.js)
+- 📋 **Complaints** - list with filters, search, pagination, accept/reject with notifications
+- 👷 **Employees** - add/remove staff members
+- ⭐ **Ratings** - employee statistics, reviews
+- 🚫 **Blocked Users** - manage blocked users
 
-### Веб-панель работника
-- 📋 **Жалобы** - список жалоб с фильтрами, поиском, пагинацией, возможность принимать/отклонять жалобы
-- ⭐ **Рейтинги** - статистика работников, отзывы
-- 🔗 **Вход** - по одноразовому коду из Telegram (`/link_account`)
+### Employee Web Panel
+- 📋 **Complaints** - list with filters, search, pagination, accept/reject complaints
+- ⭐ **Ratings** - employee statistics, reviews
+- 🔗 **Login** - one-time code from Telegram (`/link_account`)
 
-### Веб-панель пользователя (жителя)
-- 📋 **Мои жалобы** - список всех жалоб со статусами и оценками
-- 📝 **Подать жалобу** - форма подачи (ФИО, адрес, описание, загрузка фото/видео или ссылка)
-- 📄 **Детали жалобы** - просмотр статуса, информации о работнике, причины отказа
-- ⭐ **Оценка работы** - оценка качества выполненной работы (1-5 звёзд + отзыв)
-- 🔗 **Вход** - по одноразовому коду из Telegram (`/link_account`)
+### User Web Panel (Residents)
+- 📋 **My Complaints** - list of all complaints with statuses and ratings
+- 📝 **Submit Complaint** - form (full name, address, description, photo/video upload or link)
+- 📄 **Complaint Details** - view status, employee info, rejection reason
+- ⭐ **Rate Work** - rate completed work quality (1-5 stars + review)
+- 🔗 **Login** - one-time code from Telegram (`/link_account`)
 
-## Технологии
+## Tech Stack
 
 - **Bot**: Python 3.12, aiogram 3.15
 - **Web**: FastAPI, Jinja2, Tailwind CSS, Chart.js
 - **Database**: SQLite (aiosqlite)
-- **Deploy**: Docker Compose
+- **Deployment**: Docker Compose
 - **Notifications**: aiohttp (Telegram Bot API)
 
-## Структура проекта
+## Project Structure
 
 ```
 Toolkit-tg-bot/
 ├── bot/
-│   ├── main.py              # Точка входа бота
-│   ├── config.py            # Конфигурация (env)
-│   ├── database.py          # Инициализация БД, миграции
-│   ├── states.py            # FSM состояния
-│   ├── keyboards.py         # Inline клавиатуры
-│   ├── media_utils.py       # Скачивание медиа
-│   ├── logging_config.py    # Настройка логов
+│   ├── main.py              # Bot entry point
+│   ├── config.py            # Configuration (env)
+│   ├── database.py          # Database initialization, migrations
+│   ├── states.py            # FSM states
+│   ├── keyboards.py         # Inline keyboards
+│   ├── media_utils.py       # Media download utilities
+│   ├── logging_config.py    # Logging setup
 │   └── handlers/
-│       ├── user.py          # Команды жителей (/complaint, /rate)
-│       ├── employee.py      # Команды работников (/register, /link_account)
-│       └── admin.py         # Команды админа (/add_employee, /staff)
+│       ├── user.py          # User commands (/complaint, /rate)
+│       ├── employee.py      # Employee commands (/register, /link_account)
+│       └── admin.py         # Admin commands (/add_employee, /staff)
 ├── web/
-│   ├── main.py              # FastAPI приложение
-│   ├── auth.py              # Аутентификация (admin/employee)
-│   ├── config.py            # Конфигурация веб-панели
-│   ├── database.py          # SQLite подключение
-│   ├── logging_config.py    # Логирование
-│   ├── static/              # CSS стили
+│   ├── main.py              # FastAPI application
+│   ├── auth.py              # Authentication (admin/employee)
+│   ├── config.py            # Web panel configuration
+│   ├── database.py          # SQLite connection
+│   ├── logging_config.py    # Logging
+│   ├── static/              # CSS styles
 │   └── templates/
-│       ├── base.html        # Базовый шаблон
-│       ├── login.html       # Страница входа
-│       ├── admin/           # Шаблоны админа
+│       ├── base.html        # Base template
+│       ├── login.html       # Login page
+│       ├── admin/           # Admin templates
 │       │   ├── dashboard.html
 │       │   ├── complaints.html
 │       │   ├── complaint_detail.html
 │       │   ├── employees.html
 │       │   ├── ratings.html
 │       │   └── blocked.html
-│       └── employee/        # Шаблоны работника
+│       └── employee/        # Employee templates
 │           ├── complaints.html
 │           ├── complaint_detail.html
 │           └── ratings.html
-│       └── user/            # Шаблоны пользователя
+│       └── user/            # User templates
 │           ├── complaints.html
 │           ├── complaint_form.html
 │           ├── complaint_detail.html
 │           └── rate.html
-├── data/                    # БД + медиа (создаётся автоматически)
-├── logs/                    # Логи (создаётся автоматически)
+├── data/                    # Database + media (auto-created)
+├── logs/                    # Logs (auto-created)
 ├── docker-compose.yml
 ├── Dockerfile.bot
 ├── Dockerfile.web
@@ -115,139 +128,139 @@ Toolkit-tg-bot/
 └── .env.example
 ```
 
-## База данных
+## Database Schema
 
-SQLite с таблицами:
-- `complaints` — жалобы (id, user_id, fio, address, description, media, status, rating, review, rejection_reason...)
-- `employees` — работники (user_id, username, fio, position, area, registered, web_linked)
-- `blocked_users` — заблокированные пользователи
-- `complaint_messages` — ID сообщений для инвалидации кнопок
-- `verification_codes` — коды для связи аккаунта с веб-панелью
+SQLite database with tables:
+- `complaints` — complaints (id, user_id, fio, address, description, media, status, rating, review, rejection_reason...)
+- `employees` — employees (user_id, username, fio, position, area, registered, web_linked)
+- `blocked_users` — blocked users
+- `complaint_messages` — message IDs for button invalidation
+- `verification_codes` — codes for web panel account linking
 
-## Запуск
+## Usage
 
-### 1. Ручной запуск (Version 1 - Direct Run)
-1. Установить 3.12: `sudo apt install python3.12`
-2. Создать venv: `python3 -m venv venv && source venv/bin/activate`
-3. Установить зависимости: `pip install -r requirements.txt`
-4. Настроить `.env`: `cp .env.example .env`, `nano .env`
-5. Запустить: `python -m bot.main` (бот) и `uvicorn web.main:app` (web).
+### 1. Manual Setup (Version 1 - Direct Run)
+1. Install Python 3.12: `sudo apt install python3.12`
+2. Create virtual environment: `python3 -m venv venv && source venv/bin/activate`
+3. Install dependencies: `pip install -r requirements.txt`
+4. Configure environment: `cp .env.example .env`, `nano .env`
+5. Run: `python -m bot.main` (bot) and `uvicorn web.main:app` (web)
 
-### 2. Docker (Version 2 - Рекомендовано)
+### 2. Docker (Version 2 - Recommended)
 
-### Требования
+#### Requirements
 
-- **ОС**: Ubuntu 24.04 (или совместимая Linux система)
-- **Docker**: 24.0 или новее
-- **Docker Compose**: v2.0 или новее
+- **OS**: Ubuntu 24.04 (or compatible Linux system)
+- **Docker**: 24.0 or newer
+- **Docker Compose**: v2.0 or newer
 
-### 1. Настроить переменные окружения
+#### 1. Configure environment variables
 ```bash
 cp .env.example .env
 ```
 
-Отредактировать `.env`:
+Edit `.env`:
 ```env
-BOT_TOKEN=your_bot_token          # Токен от @BotFather
-ADMIN_ID=123456789                # Ваш Telegram ID
-LOG_CHAT_ID=-100123456789         # ID группы-архива (опционально)
-ADMIN_PASSWORD=secure_password    # Пароль админа для веб-панели
-SECRET_KEY=random_secret_key      # Секретный ключ для сессий
-DB_PATH=data/complaints.db        # Путь к базе данных
+BOT_TOKEN=your_bot_token          # Token from @BotFather
+ADMIN_ID=123456789                # Your Telegram ID
+LOG_CHAT_ID=-100123456789         # Archive group ID (optional)
+ADMIN_PASSWORD=secure_password    # Admin password for web panel
+SECRET_KEY=random_secret_key      # Secret key for sessions
+DB_PATH=data/complaints.db        # Database path
 ```
 
-**Как получить BOT_TOKEN:** [@BotFather](https://t.me/BotFather) → `/newbot`
+**How to get BOT_TOKEN:** [@BotFather](https://t.me/BotFather) → `/newbot`
 
-**Как узнать ADMIN_ID:** [@userinfobot](https://t.me/userinfobot)
+**How to get ADMIN_ID:** [@userinfobot](https://t.me/userinfobot)
 
-**Как получить LOG_CHAT_ID:** Создайте группу, добавьте бота, отправьте сообщение и проверьте через API
+**How to get LOG_CHAT_ID:** Create a group, add bot, send a message and check via API
 
-### 2. Запустить через Docker
+#### 2. Start with Docker
 ```bash
 docker compose up -d --build
 ```
 
-**Использование**
-- Telegram бот: напишите `/start`
-- Веб-панель админа: http://localhost:8000 (пароль из `ADMIN_PASSWORD`)
-- Веб-панель работника: http://localhost:8000 (код из `/link_account` в боте)
-- Веб-панель пользователя: http://localhost:8000 (код из `/link_account` в боте)
+**Access**
+- Telegram bot: send `/start` to your bot
+- Admin web panel: http://localhost:8000 (password from `ADMIN_PASSWORD`)
+- Employee web panel: http://localhost:8000 (code from `/link_account` in bot)
+- User web panel: http://localhost:8000 (code from `/link_account` in bot)
 
-Жалобы, поданные через веб-панель, автоматически отправляются работникам в Telegram с кнопками для обработки.
+Complaints submitted via web panel are automatically sent to employees in Telegram with action buttons.
 
-### Остановить
+#### Stop
 ```bash
 docker compose down
 ```
 
 ## Deployment
 
-### Развертывание на VM
+### Deployment on VM
 
-#### Системные требования
+#### System Requirements
 
-- **ОС**: Ubuntu 24.04 LTS
-- **Установленное ПО**:
+- **OS**: Ubuntu 24.04 LTS
+- **Software**:
   - Docker Engine 24.0+
   - Docker Compose v2+
   - Git
 
-#### Пошаговая инструкция
+#### Step-by-Step Instructions
 
-1. **Установить Docker и Docker Compose** (если не установлены):
+1. **Install Docker and Docker Compose** (if not installed):
    ```bash
-   # Обновить пакеты
+   # Update packages
    sudo apt update
    
-   # Установить Docker
+   # Install Docker
    sudo apt install -y docker.io docker-compose-v2
    
-   # Добавить пользователя в группу docker
+   # Add user to docker group
    sudo usermod -aG docker $USER
    newgrp docker
    ```
 
-2. **Клонировать репозиторий**:
+2. **Clone repository**:
    ```bash
    git clone https://github.com/ValekusVachpekus/se-toolkit-hackathon.git
    cd se-toolkit-hackathon
    ```
 
-3. **Настроить переменные окружения**:
+3. **Configure environment variables**:
    ```bash
    cp .env.example .env
-   nano .env  # или используйте любой текстовый редактор
+   nano .env  # or use any text editor
    ```
    
-   Обязательно заполните:
-   - `BOT_TOKEN` - токен от @BotFather
-   - `ADMIN_ID` - ваш Telegram ID
-   - `ADMIN_PASSWORD` - пароль для веб-панели
-   - `SECRET_KEY` - случайная строка для сессий
-   - `LOG_CHAT_ID` - (опционально) ID группы для архива
+   Required fields:
+   - `BOT_TOKEN` - token from @BotFather
+   - `ADMIN_ID` - your Telegram ID
+   - `ADMIN_PASSWORD` - password for web panel
+   - `SECRET_KEY` - random string for sessions
+   - `LOG_CHAT_ID` - (optional) archive group ID
 
-4. **Создать необходимые директории**:
+4. **Create required directories**:
    ```bash
    mkdir -p data logs
    chmod 777 data logs
    ```
 
-5. **Запустить приложение**:
+5. **Start application**:
    ```bash
    docker compose up -d --build
    ```
 
-6. **Проверить статус**:
+6. **Check status**:
    ```bash
    docker compose ps
    docker compose logs -f
    ```
 
-7. **Доступ к приложению**:
-   - Telegram бот: напишите `/start` вашему боту
-   - Веб-панель: `http://<IP_вашего_VM>:8000`
+7. **Access application**:
+   - Telegram bot: send `/start` to your bot
+   - Web panel: `http://<VM_IP>:8000`
 
-#### Обновление приложения
+#### Update Application
 
 ```bash
 cd se-toolkit-hackathon
@@ -256,99 +269,100 @@ docker compose down
 docker compose up -d --build
 ```
 
-#### Остановка приложения
+#### Stop Application
 
 ```bash
 docker compose down
 ```
 
-#### Полная очистка (включая данные)
+#### Full Cleanup (including data)
 
 ```bash
 docker compose down -v
 rm -rf data logs
 ```
 
-## Команды Telegram-бота
+## Telegram Bot Commands
 
-### Для жителей
-| Команда | Описание |
+### For Residents
+| Command | Description |
 |---------|----------|
-| `/start` | Начало работы |
-| `/complaint` | Подать жалобу (4 шага) |
-| `/rate` | Оценить выполненную работу |
-| `/link_account` | Получить код для входа в веб-панель |
+| `/start` | Start using the bot |
+| `/complaint` | Submit a complaint (4 steps) |
+| `/rate` | Rate completed work |
+| `/link_account` | Get login code for web panel |
 
-### Для работников
-| Команда | Описание |
+### For Employees
+| Command | Description |
 |---------|----------|
-| `/register` | Регистрация (после добавления админом) |
-| `/complaints` | Активные жалобы |
-| `/link_account` | Получить код для входа в веб-панель |
+| `/register` | Register (after admin adds you) |
+| `/complaints` | View active complaints |
+| `/link_account` | Get login code for web panel |
 
-### Для администратора
-| Команда | Описание |
+### For Administrator
+| Command | Description |
 |---------|----------|
-| `/add_employee` | Добавить работника по username |
-| `/staff` | Список работников |
-| `/complaints` | Активные жалобы |
-| `/blocked` | Заблокированные пользователи |
+| `/add_employee` | Add employee by username |
+| `/staff` | View employee list |
+| `/complaints` | View active complaints |
+| `/blocked` | View blocked users |
 
-## Веб-панель
+## Web Panel
 
-### Вход
-- **Администратор**: пароль из `.env`
-- **Работник**: одноразовый 6-значный код из команды `/link_account`
+### Login
+- **Administrator**: password from `.env`
+- **Employee**: one-time 6-digit code from `/link_account` command
+- **User**: one-time 6-digit code from `/link_account` command
 
-### Админ-панель (`/admin/*`)
-- **Дашборд** - карточки статистики + 3 графика (pie, bar, line)
-- **Жалобы** - фильтры по статусу, поиск, пагинация
-- **Детали жалобы** - медиа, принятие/отклонение с причиной
-- **Работники** - добавление/удаление
-- **Рейтинги** - средний рейтинг работников, последние отзывы
-- **Заблокированные** - список заблокировнных пользователей и возможность разблокировки
+### Admin Panel (`/admin/*`)
+- **Dashboard** - statistics cards + 3 charts (pie, bar, line)
+- **Complaints** - filters by status, search, pagination
+- **Complaint Details** - media view, accept/reject with reason
+- **Employees** - add/remove staff
+- **Ratings** - average employee ratings, recent reviews
+- **Blocked Users** - list of blocked users with unblock option
 
-### Панель работника (`/employee/*`)
-- **Жалобы** - просмотр, принятие/отклонение
-- **Рейтинги** - общая статистика
+### Employee Panel (`/employee/*`)
+- **Complaints** - view, accept/reject complaints
+- **Ratings** - overall statistics
 
-### Панель пользователя (`/user/*`)
-- **Мои жалобы** (`/user/complaints`) - список всех жалоб со статусами
-- **Подать жалобу** (`/user/complaints/new`) - форма с загрузкой медиа
-- **Детали жалобы** (`/user/complaints/{id}`) - полная информация, статус, работник
-- **Оценить работу** (`/user/complaints/{id}/rate`) - оценка 1-5 звёзд + отзыв
+### User Panel (`/user/*`)
+- **My Complaints** (`/user/complaints`) - list of all complaints with statuses
+- **Submit Complaint** (`/user/complaints/new`) - form with media upload
+- **Complaint Details** (`/user/complaints/{id}`) - full info, status, assigned employee
+- **Rate Work** (`/user/complaints/{id}/rate`) - rate 1-5 stars + review
 
-## Реализовано
+## Implemented Features
 
-- [x] Telegram бот с FSM
-- [x] Подача жалоб (ФИО, адрес, описание, медиа)
-- [x] Панель администратора
-- [x] Панель работника
-- [x] Панель пользователя (жителя)
-- [x] Система рейтингов (1-5 звёзд + отзыв)
-- [x] Графики на дашборде
-- [x] Уведомления через Telegram API
-- [x] Архивирование в лог-группу
-- [x] Вход работника/пользователя по коду
-- [x] Загрузка медиа в Telegram из веб-панели
-- [x] Инвалидация кнопок после обработки жалобы
-- [x] Публичная форма подачи жалоб
+- [x] Telegram bot with FSM
+- [x] Complaint submission (full name, address, description, media)
+- [x] Admin panel
+- [x] Employee panel
+- [x] User panel (residents)
+- [x] Rating system (1-5 stars + review)
+- [x] Dashboard charts
+- [x] Notifications via Telegram API
+- [x] Archiving to log group
+- [x] Employee/user login with codes
+- [x] Media upload to Telegram from web panel
+- [x] Button invalidation after complaint processing
+- [x] Public complaint submission form
 
-## TODO
+## Future Improvements
 
-- [ ] Экспорт жалоб в CSV/Excel
-- [ ] PostgreSQL для production
-- [ ] Push-уведомления в веб-панели
+- [ ] Export complaints to CSV/Excel
+- [ ] PostgreSQL for production
+- [ ] Push notifications in web panel
 
-## Лицензия
+## License
 
-[MIT License](LICENSE) 
+[MIT License](LICENSE)
 
-## Автор
+## Author
 
- - GitHub: [ValekusVachpekus]([url](https://github.com/ValekusVachpekus))
- - Электронная почта: i.shchetkov@innopolis.university
- - ФИО: Щетков Илья Алексеевич (Shchetkov Ilia Alexeevich)
+- **Name**: Shchetkov Ilia Alexeevich
+- **GitHub**: [ValekusVachpekus](https://github.com/ValekusVachpekus)
+- **Email**: i.shchetkov@innopolis.university
 
-Создано в рамках учебного проекта в курсе Software Engeneering Toolkit в Innopolis University
+Created as part of the Software Engineering Toolkit course at Innopolis University
 
